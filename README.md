@@ -92,3 +92,11 @@ Track Quiz Performance
 ```
 
 I plan to keep improving the UI, study features, and overall user experience as I continue working on the project.
+
+## Frontend
+
+The frontend for StudyForge is available here:
+
+[StudyForge Frontend](https://github.com/bmkekeh/StudyForge-Frontend)
+
+It is built with React and TypeScript and communicates with this backend through REST API endpoints.
