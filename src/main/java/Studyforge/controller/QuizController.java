@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
+import Studyforge.model.GeneratedQuizResponse;
+
 @RestController
 @RequestMapping("/courses/{courseId}/quiz")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -42,6 +44,21 @@ public class QuizController {
         );
     }
 
+    @PostMapping("/weak-topics")
+    public GeneratedQuizResponse generateWeakTopicQuiz(
+            @PathVariable Long courseId,
+            @RequestParam(defaultValue = "5") int questionCount,
+            @RequestParam(defaultValue = "medium") String difficulty,
+            @RequestBody List<String> weakTopics
+    ) throws Exception {
+
+        return quizService.generateWeakTopicQuiz(
+                courseId,
+                questionCount,
+                difficulty,
+                weakTopics
+        );
+    }
     @GetMapping
     public List<GeneratedQuiz> getSavedQuizzes(
             @PathVariable Long courseId) {

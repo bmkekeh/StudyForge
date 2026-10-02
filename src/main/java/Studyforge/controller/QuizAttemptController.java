@@ -1,11 +1,15 @@
 package Studyforge.controller;
 
 import Studyforge.model.QuizAttempt;
+import Studyforge.model.QuizAttemptStats;
 import Studyforge.service.QuizAttemptService;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import Studyforge.model.WeakTopic;
 
 @RestController
 @RequestMapping("/courses/{courseId}/quiz-attempts")
@@ -20,18 +24,10 @@ public class QuizAttemptController {
         this.quizAttemptService = quizAttemptService;
     }
 
-    /*
-     * Save a completed quiz attempt.
-     *
-     * Example:
-     * POST /courses/2/quiz-attempts
-     *
-     * {
-     *   "quizId": 5,
-     *   "score": 4,
-     *   "totalQuestions": 5
-     * }
-     */
+    /* =========================
+       SAVE ATTEMPT
+    ========================= */
+
     @PostMapping
     public QuizAttempt saveAttempt(
             @PathVariable Long courseId,
@@ -41,13 +37,15 @@ public class QuizAttemptController {
                 courseId,
                 request.getQuizId(),
                 request.getScore(),
-                request.getTotalQuestions()
+                request.getTotalQuestions(),
+                request.getMistakes()
         );
     }
 
-    /*
-     * Get all attempts for a course.
-     */
+    /* =========================
+       GET COURSE ATTEMPTS
+    ========================= */
+
     @GetMapping
     public List<QuizAttempt> getAttempts(
             @PathVariable Long courseId
@@ -56,14 +54,30 @@ public class QuizAttemptController {
                 .getAttemptsForCourse(courseId);
     }
 
-    /*
-     * Request body used when saving an attempt.
-     */
+    /* =========================
+       GET COURSE STATS
+    ========================= */
+
+    @GetMapping("/stats")
+    public QuizAttemptStats getStats(
+            @PathVariable Long courseId
+    ) {
+        return quizAttemptService
+                .getStats(courseId);
+    }
+
+    /* =========================
+       REQUEST BODY
+    ========================= */
+
     public static class QuizAttemptRequest {
 
         private Long quizId;
         private int score;
         private int totalQuestions;
+
+        private List<MistakeRequest> mistakes =
+                new ArrayList<>();
 
         public QuizAttemptRequest() {
         }
@@ -93,5 +107,61 @@ public class QuizAttemptController {
         ) {
             this.totalQuestions = totalQuestions;
         }
+
+        public List<MistakeRequest> getMistakes() {
+            return mistakes;
+        }
+
+        public void setMistakes(
+                List<MistakeRequest> mistakes
+        ) {
+            this.mistakes =
+                    mistakes == null
+                            ? new ArrayList<>()
+                            : mistakes;
+        }
+    }
+
+    /* =========================
+       MISTAKE REQUEST
+    ========================= */
+
+    public static class MistakeRequest {
+
+        private String topic;
+        private String question;
+
+        public MistakeRequest() {
+        }
+
+        public String getTopic() {
+            return topic;
+        }
+
+        public void setTopic(String topic) {
+            this.topic = topic;
+        }
+
+        public String getQuestion() {
+            return question;
+        }
+
+        public void setQuestion(
+                String question
+        ) {
+            this.question = question;
+        }
+    }
+
+    /* =========================
+   GET WEAK TOPICS
+========================= */
+
+    @GetMapping("/weak-topics")
+    public List<WeakTopic> getWeakTopics(
+            @PathVariable Long courseId
+    ) {
+        return quizAttemptService
+                .getWeakTopics(courseId);
     }
 }
